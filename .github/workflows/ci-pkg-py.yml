@@ -1,0 +1,50 @@
+name: Python Common Packages Lint & Test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "pkg/python/**"
+  pull_request:
+    paths:
+      - "pkg/python/**"
+
+jobs:
+  check-syntax:
+    name: Check Python Syntax
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Lint & Syntax Check
+        run: python -m compileall -q pkg/python/
+
+  test:
+    name: Run Python Tests
+    runs-on: ubuntu-latest
+    needs: check-syntax
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        working-directory: pkg/python
+        run: pip install -r requirements.txt
+
+      - name: Run Tests
+        working-directory: pkg/python
+        run: pytest
