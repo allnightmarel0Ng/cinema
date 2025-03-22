@@ -1,0 +1,5 @@
+package nothing
+
+func Nothing() {
+
+}
