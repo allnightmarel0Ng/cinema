@@ -5,10 +5,10 @@ on:
     branches:
       - master
     paths:
-      - "pkg/python/**"
+      - "backend/pkg/python/**"
   pull_request:
     paths:
-      - "pkg/python/**"
+      - "backend/pkg/python/**"
 
 jobs:
   check-syntax:
@@ -42,9 +42,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install Dependencies
-        working-directory: pkg/python
+        working-directory: backend/pkg/python
         run: pip install -r requirements.txt
 
       - name: Run Tests
-        working-directory: pkg/python
+        working-directory: backend/pkg/python
         run: pytest

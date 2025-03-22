@@ -1,28 +1,32 @@
 name: Protobuf CI
 
 on:
-    pull_request:
-        branches:
-            - master
-    push:
-        branches:
-            - master
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "backend/protos/**"
+  push:
+    branches:
+      - master
+    paths:
+      - "backend/protos/**"
 
 jobs:
-    lint:
-        name: Lint protobuf
-        runs-on: ubuntu-latest
+  lint:
+    name: Lint protobuf
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
             
-            - name: Setup protoc
-              uses: arduino/setup-protoc@v3.0.0
+      - name: Setup protoc
+        uses: arduino/setup-protoc@v3.0.0
             
-            - name: Validate Protobuf Syntax
-              run: |
-                for file in $(find backend/protos -wholename "*/*.proto"); do
-                  echo "Checking $file"
-                  protoc --proto_path=backend/protos --descriptor_set_out=/dev/null "$file"
-                done
+      - name: Validate Protobuf Syntax
+        run: |
+          for file in $(find backend/protos -wholename "*/*.proto"); do
+            echo "Checking $file"
+            protoc --proto_path=backend/protos --descriptor_set_out=/dev/null "$file"
+          done
