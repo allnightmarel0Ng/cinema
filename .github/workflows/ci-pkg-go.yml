@@ -11,6 +11,38 @@ on:
       - "backend/pkg/go/**"
 
 jobs:
+  format-lint:
+    name: Format and lint go code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.1"
+
+      - name: Check Formatting (gofmt)
+        working-directory: backend/pkg/go
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Go code is not formatted. Run 'gofmt -w .' to fix."
+            exit 1
+          fi
+
+      - name: Install golangci-lint
+        working-directory: backend/pkg/go
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Run Linter (golangci-lint)
+        working-directory: backend/pkg/go
+        run: | 
+          find . -name "go.mod" -execdir golangci-lint run --timeout=5m \;
+
   build:
     name: Build Go Code
     runs-on: ubuntu-latest
@@ -22,11 +54,12 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: "1.24.1"
 
       - name: Build Go Pkg
         working-directory: backend/pkg/go
-        run: go build ./...
+        run: | 
+          find . -name "go.mod" -execdir go build ./... \;
 
   test:
     name: Run Go Tests
@@ -40,8 +73,9 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.21"
+          go-version: "1.24.1"
 
       - name: Run Go Pkg Tests
         working-directory: backend/pkg/go
-        run: go test ./...
+        run: | 
+          find . -name "go.mod" -execdir go test ./... \;

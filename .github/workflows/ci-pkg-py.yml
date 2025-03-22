@@ -11,8 +11,8 @@ on:
       - "backend/pkg/python/**"
 
 jobs:
-  check-syntax:
-    name: Check Python Syntax
+  format-lint:
+    name: Python Format & Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -24,13 +24,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Lint & Syntax Check
-        run: python -m compileall -q pkg/python/
+      - name: Install Formatting & Linting Tools
+        run: pip install black flake8
+
+      - name: Check Formatting (black)
+        run: black --check backend/pkg/python/
+
+      - name: Run Linter (flake8)
+        run: flake8 backend/pkg/python/
 
   test:
     name: Run Python Tests
     runs-on: ubuntu-latest
-    needs: check-syntax
+    needs: format-lint
 
     steps:
       - name: Checkout Repository
@@ -41,10 +47,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Dependencies
-        working-directory: backend/pkg/python
-        run: pip install -r requirements.txt
+      - name: Find and Install Requirements
+        run: |
+          find backend/pkg/python -name "requirements.txt" -exec pip install -r {} +
 
-      - name: Run Tests
-        working-directory: backend/pkg/python
-        run: pytest
+      - name: Find and Run Python Tests
+        run: |
+          find backend/pkg/python -name "tests" -type d -exec pytest {} +
