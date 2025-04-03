@@ -10,6 +10,8 @@ service StorageService{
     rpc SearchMovies(SearchRequest) returns (stream MovieShort);
 
     rpc GetActor(ActorRequest) returns (ActorResponse);
+    rpc GetActors(ActorsRequest) returns (ActorsResponse);
+    rpc SearchActors(SearchRequest) returns (stream ActorShort);
 
     rpc HealthCheck(HealthRequest) returns (HealthResponse);
 }
@@ -25,11 +27,11 @@ message HealthResponse {
   ServingStatus status = 1;
 }
 
-message MovieRequest{
+message MovieRequest {
     string movie_id = 1;
 }
 
-message MoviesRequest{
+message MoviesRequest {
     repeated string movie_ids = 1;
     int32 limit = 2;
 }
@@ -41,7 +43,7 @@ message MoviesResponse {
     repeated MovieResponse movies = 1;
 }
 
-message MovieResponse{
+message MovieResponse {
     string id = 1;
     string title = 2;
     string description = 3;
@@ -65,10 +67,24 @@ message ActorRequest {
   string actor_id = 1;
 }
 
+message ActorsRequest {
+    repeated string actor_ids = 1;
+    int32 limit = 2;
+}
+
+message ActorsResponse {
+    repeated ActorResponse actors = 1;
+}
+
 message ActorResponse {
   string id = 1;
   string name = 2;
   string bio = 3;
   google.protobuf.Timestamp birth_date = 4;
   repeated string filmography = 5;
+}
+
+message ActorShort {
+    string id = 1;
+    string name = 2;
 }
