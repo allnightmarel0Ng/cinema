@@ -1,0 +1,4 @@
+.env
+postgres-data/
+redis-data/
+clickhouse-data/
