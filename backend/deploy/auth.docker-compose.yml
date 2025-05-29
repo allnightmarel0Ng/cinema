@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  auth:
+    build:
+      context: ../services/auth_service
+    container_name: auth_service
+    env_file:
+      - ../services/auth_service/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      auth_db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  auth_db:
+    image: postgres:14
+    container_name: auth_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+      - ./deploy/grafana/provisioning/datasources:/app/deploy/grafana/provisioning/datasources
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  auth_db_data:
+
+networks:
+  backend:
+    driver: bridge
