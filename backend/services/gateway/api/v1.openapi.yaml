@@ -1,0 +1,589 @@
+openapi: 3.0.3
+info:
+  title: Cinema Service API
+  version: 1.0.0
+  description: Cinema Gateway API
+
+servers:
+  - url: http://localhost:8080/api
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    BasicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    Actor:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        gender:
+          type: integer
+        profile_path:
+          type: string
+
+    Review:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        movie_id:
+          type: integer
+        liked:
+          type: boolean
+        title:
+          type: string
+        text:
+          type: string
+
+    Rating:
+      type: object
+      properties:
+        movie_id:
+          type: integer
+        rating:
+          type: number
+          format: float
+
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+        tmdb_id:
+          type: integer
+        title:
+          type: string
+        overview:
+          type: string
+        stream_link:
+          type: string
+        release_date:
+          type: string
+          format: date
+        poster_path:
+          type: string
+        tmdb_vote_average:
+          type: number
+          format: float
+        tmdb_vote_count:
+          type: integer
+        vote_average:
+          type: number
+          format: float
+        vote_count:
+          type: integer
+        adult:
+          type: boolean
+        revenue:
+          type: integer
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+        actors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Actor'
+
+paths:
+  /register:
+    post:
+      summary: Register new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful register
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /login:
+    post:
+      summary: Login and obtain JWT token
+      security:
+        - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  
+  /logout:
+    post:
+      summary: Logout from account
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful register
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      
+
+  
+  /movies/{id}:
+    get:
+      summary: Get movie by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movie details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /movies/search:
+    get:
+      summary: Search movies by name
+      parameters:
+        - name: prompt
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of found movies
+          content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Movie'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /movies/popular:
+    get:
+      summary: Get popular movies
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of most popular movies in page
+          content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Movie'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  
+  /actors/{id}:
+    get:
+      summary: Get actor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Actor details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /actors/search:
+    get:
+      summary: Search actors by name
+      parameters:
+        - name: prompt
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of found actors
+          content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Actor'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  
+  /reviews/{movie_id}:
+    get:
+      summary: Get reviews for a movie
+      parameters:
+        - name: movie_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reviews found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    
+    post:
+      summary: Create or update a review for a movie
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: movie_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                liked:
+                  type: boolean
+                title:
+                  type: string
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Review saved
+        '401':
+          description: Attempt to change review that not yours or other auth error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    delete:
+      summary: Delete a review for a movie
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: movie_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Review deleted
+        '401':
+          description: Attempt to delete review that not yours
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Review was not found
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  
+  /rating:
+    post:
+      summary: Rate a movie
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: movie_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: rating
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+      responses:
+        '200':
+          description: Rating saved
+        '401':
+          description: Authorization error (probably token invalidated)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+    delete:
+      summary: Delete movie rate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: movie_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rating deleted
+        '401':
+          description: Attempt to delete rating that not yours
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Rating was not found
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /users/{id}:
+    get:
+      summary: Get profile of user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rating deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  ratings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Rating'
+                  login:
+                    type: string
+        '404':
+          description: User was not found
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
