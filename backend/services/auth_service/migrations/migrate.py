@@ -58,7 +58,7 @@ async def migrate():
         if not has_users_table:
             print("Creating tables...")
             await conn.run_sync(Base.metadata.create_all)
-            print("Tables created + test user added")
+            print("Tables created")
         else:
             print("Tables already exist")
 
