@@ -50,7 +50,7 @@ func (h *httpClient) FetchMovies(ctx context.Context, startID int64, size int, t
 
 					req, err := http.NewRequestWithContext(reqCtx, "GET", url, nil)
 					if err != nil {
-						ctxlogrus.Extract(ctx).Printf("error creating request: %v\n", err)
+						ctxlogrus.Extract(ctx).Warnf("error creating request: %v\n", err)
 						continue
 					}
 
@@ -59,15 +59,15 @@ func (h *httpClient) FetchMovies(ctx context.Context, startID int64, size int, t
 
 					res, err := h.client.Do(req)
 					if err != nil {
-						ctxlogrus.Extract(ctx).Printf("error making request: %v\n", err)
+						ctxlogrus.Extract(ctx).Warnf("error making request: %v\n", err)
 						continue
 					}
 					defer res.Body.Close()
 
 					if res.StatusCode != http.StatusOK {
-						ctxlogrus.Extract(ctx).Printf("Received non-200 response: %d\n", res.StatusCode)
+						ctxlogrus.Extract(ctx).Warnf("Received non-200 response: %d\n", res.StatusCode)
 						body, _ := io.ReadAll(res.Body)
-						ctxlogrus.Extract(ctx).Printf("Response body: %s\n", body)
+						ctxlogrus.Extract(ctx).Warnf("Response body: %s\n", body)
 						continue
 					}
 
@@ -75,7 +75,7 @@ func (h *httpClient) FetchMovies(ctx context.Context, startID int64, size int, t
 
 					var movie entities.Movie
 					if err := json.Unmarshal(body, &movie); err != nil {
-						ctxlogrus.Extract(ctx).Printf("Error unmarshalling response: %v\n", err)
+						ctxlogrus.Extract(ctx).Warnf("Error unmarshalling response: %v\n", err)
 						continue
 					}
 
