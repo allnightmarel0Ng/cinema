@@ -1,0 +1,5 @@
+services:
+  etl:
+    container_name: etl
+    build:
+      context: ../services/etl

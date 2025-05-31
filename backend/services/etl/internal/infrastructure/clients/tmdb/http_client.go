@@ -10,6 +10,7 @@ import (
 
 	"github.com/allnightmarel0Ng/cinema/backend/services/etl/internal/domain/clients"
 	"github.com/allnightmarel0Ng/cinema/backend/services/etl/internal/domain/entities"
+	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
 )
 
 type httpClient struct {
@@ -49,7 +50,7 @@ func (h *httpClient) FetchMovies(ctx context.Context, startID int64, size int, t
 
 					req, err := http.NewRequestWithContext(reqCtx, "GET", url, nil)
 					if err != nil {
-						fmt.Printf("Error creating request: %v\n", err) // TODO: use logger, use metrics
+						ctxlogrus.Extract(ctx).Printf("error creating request: %v\n", err)
 						continue
 					}
 
@@ -58,15 +59,15 @@ func (h *httpClient) FetchMovies(ctx context.Context, startID int64, size int, t
 
 					res, err := h.client.Do(req)
 					if err != nil {
-						fmt.Printf("Error making request: %v\n", err) // TODO: use logger, use metrics
+						ctxlogrus.Extract(ctx).Printf("error making request: %v\n", err)
 						continue
 					}
 					defer res.Body.Close()
 
 					if res.StatusCode != http.StatusOK {
-						fmt.Printf("Received non-200 response: %d\n", res.StatusCode) // TODO: use logger, use metrics
+						ctxlogrus.Extract(ctx).Printf("Received non-200 response: %d\n", res.StatusCode)
 						body, _ := io.ReadAll(res.Body)
-						fmt.Printf("Response body: %s\n", body)
+						ctxlogrus.Extract(ctx).Printf("Response body: %s\n", body)
 						continue
 					}
 
@@ -74,7 +75,7 @@ func (h *httpClient) FetchMovies(ctx context.Context, startID int64, size int, t
 
 					var movie entities.Movie
 					if err := json.Unmarshal(body, &movie); err != nil {
-						fmt.Printf("Error unmarshalling response: %v\n", err) // TODO: use logger, use metrics
+						ctxlogrus.Extract(ctx).Printf("Error unmarshalling response: %v\n", err)
 						continue
 					}
 

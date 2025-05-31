@@ -7,6 +7,5 @@ import (
 )
 
 type Movies interface {
-	InsertMovie(ctx context.Context, movie *entities.Movie) error
-	GetMaxID(ctx context.Context) (int64, error)
+	InsertMovies(ctx context.Context, movies []entities.Movie) error
 }

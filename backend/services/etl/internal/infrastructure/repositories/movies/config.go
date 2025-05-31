@@ -1,13 +1,15 @@
 package movies
 
-import "time"
+import (
+	"time"
+)
 
 type Config struct {
-	DatabaseHost string
-	DatabasePort string
-	DatabaseUser string
-	DatabasePass string
-	DatabaseName string
+	RedisPublisherConfig
+}
 
-	Timeout time.Duration
+type RedisPublisherConfig struct {
+	Addr           string
+	PublishChannel string
+	Timeout        time.Duration
 }
