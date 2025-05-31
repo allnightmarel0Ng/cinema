@@ -36,7 +36,8 @@ func (rs *redisSubscriber) Subscribe(ctx context.Context) <-chan []entities.Movi
 				return
 			case msg := <-sub:
 				var movies []movie
-				if err := json.Unmarshal([]byte(msg.String()), &movies); err != nil {
+				ctxlogrus.Extract(ctx).Info(msg.Payload)
+				if err := json.Unmarshal([]byte(msg.Payload), &movies); err != nil {
 					ctxlogrus.Extract(ctx).Warn("unable to unmrshal data from redis")
 					continue
 				}
@@ -59,7 +60,7 @@ func toDomainMovies(movies []movie) ([]entities.Movie, error) {
 	result := make([]entities.Movie, 0, len(movies))
 
 	for _, movie := range movies {
-		releaseDate, err := time.Parse("YYYY-MM-DD", movie.ReleaseDate)
+		releaseDate, err := time.Parse("2006-01-02", movie.ReleaseDate)
 		if err != nil {
 			return nil, err
 		}

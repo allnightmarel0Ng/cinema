@@ -54,26 +54,29 @@ func (gm *gormMovies) InsertMovies(ctx context.Context, movies []entities.Movie)
 				actors[i] = actor
 			}
 
+			movie.Actors = actors
+			movie.Genres = genres
+
 			var existingMovie entities.Movie
 			err := tx.Where("tmdb_id = ?", movie.TheMovieDBID).First(&existingMovie).Error
 
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				if err := tx.Create(movie).Error; err != nil {
+				if err := tx.Create(&movie).Error; err != nil {
 					return err
 				}
 			} else if err == nil {
 				movie.ID = existingMovie.ID
-				if err := tx.Save(movie).Error; err != nil {
+				if err := tx.Save(&movie).Error; err != nil {
 					return err
 				}
 			} else {
 				return err
 			}
 
-			if err := tx.Model(movie).Association("Genres").Replace(genres); err != nil {
+			if err := tx.Model(&movie).Association("Genres").Replace(genres); err != nil {
 				return err
 			}
-			if err := tx.Model(movie).Association("Actors").Replace(actors); err != nil {
+			if err := tx.Model(&movie).Association("Actors").Replace(actors); err != nil {
 				return err
 			}
 
