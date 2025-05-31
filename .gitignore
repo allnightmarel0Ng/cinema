@@ -1,0 +1,7 @@
+frontend/node_modules
+.idea
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/.gitignore
+/.idea/cinema.iml
+/.idea/modules.xml
+/.idea/vcs.xml
