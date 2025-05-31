@@ -76,7 +76,7 @@ func toDomainMovies(movies []movie) ([]entities.Movie, error) {
 			Adult:                 movie.Adult,
 			Revenue:               int(movie.Revenue),
 			Genres:                toDomainGenre(movie.Genres),
-			Actors:                toDomainActor(movie.Actors),
+			Actors:                toDomainActor(movie.Credits.Actors),
 		})
 	}
 

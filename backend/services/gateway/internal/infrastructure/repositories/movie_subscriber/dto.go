@@ -11,7 +11,9 @@ type movie struct {
 	Adult       bool    `json:"adult"`
 	Revenue     int64   `json:"revenue"`
 	Genres      []genre `json:"genres"`
-	Actors      []actor `json:"cast"`
+	Credits     struct {
+		Actors []actor `json:"cast"`
+	} `json:"credits"`
 }
 
 type genre struct {
