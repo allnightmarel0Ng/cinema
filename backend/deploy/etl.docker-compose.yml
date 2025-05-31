@@ -1,0 +1,12 @@
+services:
+  etl:
+    container_name: etl
+    build:
+      context: ../services/etl
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./configs/promtail-external.yaml:/etc/promtail/config.yml
