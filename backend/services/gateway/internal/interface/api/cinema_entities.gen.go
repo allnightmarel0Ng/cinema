@@ -65,12 +65,6 @@ type GetActorsSearchParams struct {
 	Prompt string `form:"prompt" json:"prompt"`
 }
 
-// PostLoginJSONBody defines parameters for PostLogin.
-type PostLoginJSONBody struct {
-	Password *string `json:"password,omitempty"`
-	Username *string `json:"username,omitempty"`
-}
-
 // GetMoviesPopularParams defines parameters for GetMoviesPopular.
 type GetMoviesPopularParams struct {
 	Page *int `form:"page,omitempty" json:"page,omitempty"`
@@ -105,9 +99,6 @@ type PostReviewsMovieIdJSONBody struct {
 	Text  *string `json:"text,omitempty"`
 	Title *string `json:"title,omitempty"`
 }
-
-// PostLoginJSONRequestBody defines body for PostLogin for application/json ContentType.
-type PostLoginJSONRequestBody PostLoginJSONBody
 
 // PostRegisterJSONRequestBody defines body for PostRegister for application/json ContentType.
 type PostRegisterJSONRequestBody PostRegisterJSONBody

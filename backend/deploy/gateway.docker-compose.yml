@@ -1,0 +1,13 @@
+services:
+  gateway:
+    container_name: gateway
+    build:
+      context: ../services/gateway
+    restart: always
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./configs/promtail-internal.yaml:/etc/promtail/config.yml
