@@ -35,6 +35,7 @@ services:
     volumes:
       - /var/log:/var/log
       - ./configs/promtail-internal.yaml
+      # - ./promtail-config.yml:/etc/promtail/config.yml
     command:
       - "-config.file=/etc/promtail/config.yml"
 
