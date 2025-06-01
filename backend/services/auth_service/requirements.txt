@@ -11,3 +11,4 @@ asyncpg
 loki-logger-handler
 pyyaml
 redis
+PyJWT==2.8.0

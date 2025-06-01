@@ -9,6 +9,8 @@ import os
 import base64
 from uuid import uuid4
 from fastapi import Header
+from datetime import datetime, timedelta
+import jwt
 
 router = APIRouter()
 
@@ -30,7 +32,7 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     new_user = await crud.create_user(db, user.username, user.password)
     return {"id": new_user.id, "username": new_user.username}
 
-@router.post("/login", response_model=schemas.Token)
+@router.post("/login", response_model=dict)
 async def login(authorization: str = Header(...), db: AsyncSession = Depends(get_db)):
     if not authorization.startswith("Basic "):
         raise HTTPException(status_code=400, detail="Invalid Authorization header format")
@@ -39,35 +41,34 @@ async def login(authorization: str = Header(...), db: AsyncSession = Depends(get
         username, password = decoded.split(":")
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid Base64 encoding")
+    
     user = await crud.authenticate_user(db, username, password)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    token = str(uuid4())
-    redis_client.set(token, user.id, ex=3600)
-    return {"access_token": token, "token_type": "bearer"}
+
+    expire = datetime.utcnow() + timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)))
+    payload = {"sub": user.id, "exp": expire}
+    token = jwt.encode(payload, os.getenv("JWT_SECRET"), algorithm=os.getenv("JWT_ALGORITHM"))
+
+    redis_client.set(token, user.id, ex=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)) * 60)
     
-    try:
-        user_id = int(user_id)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid user ID format")
-    
-    user = await crud.get_user_by_id(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return {"id": user.id, "username": user.username}
+    return {"access_token": token, "token_type": "bearer", "user_id": user.id}
 
 
 @router.get("/authorize", response_model=dict)
 async def authorize(token: str, db: AsyncSession = Depends(get_db)):
-    user_id = redis_client.get(token)
-    if not user_id:
+    if not redis_client.exists(token):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     
     try:
-        user_id = int(user_id)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid user ID format")
+        payload = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms=[os.getenv("JWT_ALGORITHM")])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
     
     return {"user_id": user_id}
 
