@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiService } from '../services/mockApi.ts';
+import { apiService } from '../services/api.ts';
 import { Actor, Movie } from '../types/api.ts';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import MovieCard from '../components/MovieCard.tsx';

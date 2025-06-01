@@ -1,7 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { Movie, Actor, Review, User, AuthResponse } from '../types/api.ts';
+import {toast} from "react-hot-toast";
 
-const API_URL = 'http://158.160.167.40:8080';
+const API_URL = 'http://158.160.167.40:8080/api';
 
 class ApiService {
   private api: AxiosInstance;
@@ -21,6 +22,7 @@ class ApiService {
       }
       return config;
     });
+    console.log("Api Service Initialized");
   }
 
   // Auth endpoints
@@ -45,7 +47,7 @@ class ApiService {
           }
         }
     );
-
+    console.log(response.data);
     return response.data;
   }
 
@@ -70,6 +72,7 @@ class ApiService {
     const response = await this.api.get<Movie[]>('/movies/popular', {
       params: { page, size },
     });
+    toast.custom((response.data).toString());
     return response.data;
   }
 

@@ -1,0 +1,16 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:80'
+    environment:
+      - API_BASE_URL=http://158.160.167.40:8080/api
+    restart: unless-stopped
+    networks:
+      - frontend-net
+
+networks:
+  frontend-net:
+    driver: bridge
