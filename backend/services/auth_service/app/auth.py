@@ -58,11 +58,18 @@ async def login(authorization: str = Header(...), db: AsyncSession = Depends(get
     return {"id": user.id, "username": user.username}
 
 
-@router.get("/authorize", response_model=schemas.User)
+@router.get("/authorize", response_model=dict)
 async def authorize(token: str, db: AsyncSession = Depends(get_db)):
     user_id = redis_client.get(token)
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid user ID format")
+    
+    return {"user_id": user_id}
 
 @router.get("/get-username/{user_id}", response_model=dict)
 async def get_username(user_id: int, db: AsyncSession = Depends(get_db)):
