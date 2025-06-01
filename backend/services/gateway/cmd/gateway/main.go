@@ -26,14 +26,18 @@ import (
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	gormtracing "gorm.io/plugin/opentelemetry/tracing"
 )
 
 func main() {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	cfg := config.MustLoad()
 
@@ -52,6 +56,10 @@ func main() {
 		&entities.Review{},
 		&entities.Rating{},
 	); err != nil {
+		panic(err)
+	}
+
+	if err := db.Use(gormtracing.NewPlugin()); err != nil {
 		panic(err)
 	}
 
@@ -90,6 +98,9 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	traceFunc := tracing.MustInit(ctx, cfg.Collector.Addr)
+	defer traceFunc()
+
 	router.Use(otelgin.Middleware("gateway"))
 
 	api.RegisterHandlersWithOptions(router, mainController, api.GinServerOptions{
@@ -107,15 +118,9 @@ func main() {
 
 	subscriber := moviesubscriber.NewRedisSubcriber(redisClient, cfg.Subscriber)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	ctx = ctxlogrus.ToContext(ctx, logger.WithFields(logrus.Fields{"service": "gateway"}))
-	traceFunc := tracing.MustInit(ctx, cfg.Collector.Addr)
-	defer traceFunc()
 
 	go poll.New(subscriber, moviesRepo).Poll(ctx)
-
 
 	go router.Run(":8080")
 
