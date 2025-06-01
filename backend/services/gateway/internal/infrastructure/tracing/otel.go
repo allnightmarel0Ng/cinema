@@ -34,5 +34,5 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 		propagation.Baggage{},
 	))
 
-	return func() { _ = tp.Shutdown(ctx) }
+	return func() { tp.Shutdown(ctx) }
 }
