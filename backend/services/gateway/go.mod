@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/getkin/kin-openapi v0.132.0
+	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/improbable-eng/go-httpwares v0.0.0-20200609095714-edc8019f93cc
 	github.com/joho/godotenv v1.5.1

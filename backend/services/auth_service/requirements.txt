@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+passlib[bcrypt]
+python-jose
+python-dotenv
+pydantic-settings
+python-multipart
+asyncpg
+loki-logger-handler
+pyyaml
+redis
+PyJWT==2.8.0

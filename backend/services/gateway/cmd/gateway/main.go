@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/application/poll"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/config"
@@ -20,6 +21,7 @@ import (
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/controllers"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
 	"github.com/redis/go-redis/v9"
@@ -79,6 +81,17 @@ func main() {
 	gin.SetMode("release")
 	router := gin.New()
 
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	router.Use(otelgin.Middleware("gateway"))
+
 	api.RegisterHandlersWithOptions(router, mainController, api.GinServerOptions{
 		BaseURL: "/api",
 		Middlewares: []api.MiddlewareFunc{
@@ -103,7 +116,6 @@ func main() {
 
 	go poll.New(subscriber, moviesRepo).Poll(ctx)
 
-	router.Use(otelgin.Middleware("gateway"))
 
 	go router.Run(":8080")
 
