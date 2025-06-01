@@ -1,0 +1,107 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "login": "admin_user",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    },
+    {
+      "id": 2,
+      "username": "user1",
+      "password": "password1",
+      "login": "regular_user",
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWF0IjoxNTE2MjM5MDIyfQ.5c9JZsXZ3W5hKz7Y9wQ1w5v2d3e4r5t6y7u8i9o0p"
+    }
+  ],
+  "genres": [
+    { "id": 1, "name": "Action" },
+    { "id": 2, "name": "Comedy" },
+    { "id": 3, "name": "Drama" },
+    { "id": 4, "name": "Sci-Fi" },
+    { "id": 5, "name": "Horror" }
+  ],
+  "actors": [
+    {
+      "id": 1,
+      "name": "Tom Hanks",
+      "gender": 2,
+      "profile_path": "/tHn4nQuN0HjPqQH3O0a4v4wYQ2p.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Meryl Streep",
+      "gender": 1,
+      "profile_path": "/u7O5SVw5eOlR5FUSI6X5G4gqMnB.jpg"
+    }
+  ],
+  "movies": [
+    {
+      "id": 1,
+      "tmdb_id": 278,
+      "title": "The Shawshank Redemption",
+      "overview": "Two imprisoned men bond over a number of years...",
+      "stream_link": "https://example.com/movie/1",
+      "release_date": "1994-09-23",
+      "poster_path": "/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+      "tmdb_vote_average": 8.7,
+      "tmdb_vote_count": 21741,
+      "vote_average": 8.9,
+      "vote_count": 42,
+      "adult": false,
+      "revenue": 28341469,
+      "genres": [3, 4],
+      "actors": [1]
+    },
+    {
+      "id": 2,
+      "tmdb_id": 238,
+      "title": "The Godfather",
+      "overview": "The aging patriarch of an organized crime dynasty...",
+      "stream_link": "https://example.com/movie/2",
+      "release_date": "1972-03-24",
+      "poster_path": "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+      "tmdb_vote_average": 8.7,
+      "tmdb_vote_count": 16012,
+      "vote_average": 8.8,
+      "vote_count": 35,
+      "adult": false,
+      "revenue": 245066411,
+      "genres": [1, 3],
+      "actors": [1, 2]
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "movie_id": 1,
+      "liked": true,
+      "title": "Amazing movie!",
+      "text": "One of the best movies I've ever seen."
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "movie_id": 2,
+      "liked": true,
+      "title": "Classic masterpiece",
+      "text": "Marlon Brando was incredible in this role."
+    }
+  ],
+  "ratings": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "movie_id": 1,
+      "rating": 9.5
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "movie_id": 2,
+      "rating": 9.0
+    }
+  ]
+}
