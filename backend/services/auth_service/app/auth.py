@@ -6,7 +6,9 @@ from app.database import SessionLocal
 from app.crud import authenticate_user
 import redis
 import os
+import base64
 from uuid import uuid4
+from fastapi import Header
 
 router = APIRouter()
 
@@ -29,19 +31,20 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     return {"id": new_user.id, "username": new_user.username}
 
 @router.post("/login", response_model=schemas.Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
-    user = await crud.authenticate_user(db, form_data.username, form_data.password)
+async def login(authorization: str = Header(...), db: AsyncSession = Depends(get_db)):
+    if not authorization.startswith("Basic "):
+        raise HTTPException(status_code=400, detail="Invalid Authorization header format")
+    try:
+        decoded = base64.b64decode(authorization[6:]).decode("utf-8")
+        username, password = decoded.split(":")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid Base64 encoding")
+    user = await crud.authenticate_user(db, username, password)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     token = str(uuid4())
     redis_client.set(token, user.id, ex=3600)
     return {"access_token": token, "token_type": "bearer"}
-
-@router.get("/authorize", response_model=schemas.User)
-async def authorize(token: str, db: AsyncSession = Depends(get_db)):
-    user_id = redis_client.get(token)
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
     
     try:
         user_id = int(user_id)
@@ -53,6 +56,13 @@ async def authorize(token: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     
     return {"id": user.id, "username": user.username}
+
+@router.get("/get-username/{user_id}", response_model=dict)
+async def get_username(user_id: int, db: AsyncSession = Depends(get_db)):
+    user = await crud.get_user_by_id(db, user_id)
+    if not user:
+        return {"username": ""}
+    return {"username": user.username}
 
 @router.post("/logout")
 async def logout(token: str):
