@@ -16,6 +16,7 @@ import (
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movies"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/ratings"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/reviews"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/controllers"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/middleware"
@@ -96,6 +97,8 @@ func main() {
 	defer cancel()
 
 	ctx = ctxlogrus.ToContext(ctx, logger.WithFields(logrus.Fields{"service": "gateway"}))
+	traceFunc := tracing.MustInit(ctx, cfg.Collector.Addr)
+	defer traceFunc()
 
 	go poll.New(subscriber, moviesRepo).Poll(ctx)
 
