@@ -12,8 +12,6 @@ services:
     depends_on:
       auth_db:
         condition: service_healthy
-    networks:
-      - backend
 
   auth_db:
     image: postgres:14
@@ -25,8 +23,6 @@ services:
     volumes:
       - auth_db_data:/var/lib/postgresql/data
       - ./deploy/grafana/provisioning/datasources:/app/deploy/grafana/provisioning/datasources
-    networks:
-      - backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -41,12 +37,6 @@ services:
       - ./promtail-config.yml:/etc/promtail/config.yml
     command:
       - "-config.file=/etc/promtail/config.yml"
-    networks:
-      - backend
 
 volumes:
   auth_db_data:
-
-networks:
-  backend:
-    driver: bridge

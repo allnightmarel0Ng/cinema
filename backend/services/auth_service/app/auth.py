@@ -5,11 +5,16 @@ from app import crud, schemas, utils
 from app.database import SessionLocal
 from app.crud import authenticate_user
 import redis
+import os
 from uuid import uuid4
 
 router = APIRouter()
 
-redis_client = redis.StrictRedis(host="redis", port=6379, decode_responses=True)
+redis_client = redis.StrictRedis(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=6379,
+    decode_responses=True
+)
 
 async def get_db():
     async with SessionLocal() as db:
