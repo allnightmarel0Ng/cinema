@@ -26,6 +26,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 func main() {
@@ -101,6 +102,8 @@ func main() {
 	defer traceFunc()
 
 	go poll.New(subscriber, moviesRepo).Poll(ctx)
+
+	router.Use(otelgin.Middleware("gateway"))
 
 	go router.Run(":8080")
 
