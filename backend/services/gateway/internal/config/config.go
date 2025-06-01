@@ -5,15 +5,14 @@ import (
 	"time"
 
 	moviesubscriber "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movie_subscriber"
-	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movies"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	Subscriber moviesubscriber.Config
-	Movies     movies.Config
 	Database   DatabaseConfig
 	Redis      RedisConfig
+	Auth       AuthConfig
 }
 
 type DatabaseConfig struct {
@@ -22,10 +21,17 @@ type DatabaseConfig struct {
 	User     string
 	Password string
 	Name     string
+
+	Timeout time.Duration
 }
 
 type RedisConfig struct {
 	Addr string
+}
+
+type AuthConfig struct {
+	Host    string
+	Timeout time.Duration
 }
 
 func MustLoad() Config {
@@ -36,20 +42,23 @@ func MustLoad() Config {
 			SubscribeChannel: stringOrDefault("REDIS_SUBSCRIBE_CHANNEL", "movies"),
 		},
 
-		Movies: movies.Config{
-			Timeout: timeOrDefault("MOVIE_DB_TIMEOUT", 5*time.Second),
-		},
-
 		Database: DatabaseConfig{
 			Host:     stringOrDefault("DATABASE_HOST", ""),
 			Port:     stringOrDefault("DATABASE_PORT", ""),
 			User:     stringOrDefault("DATABASE_USER", ""),
 			Password: stringOrDefault("DATABASE_PASSWORD", ""),
 			Name:     stringOrDefault("DATABASE_NAME", ""),
+
+			Timeout: timeOrDefault("DATABASE_TIMEOUT", 10*time.Second),
 		},
 
 		Redis: RedisConfig{
 			Addr: stringOrDefault("REDIS_ADDR", ""),
+		},
+
+		Auth: AuthConfig{
+			Host:    stringOrDefault("AUTH_HOST", ""),
+			Timeout: timeOrDefault("AUTH_TIMEOUT", 5*time.Second),
 		},
 	}
 }
