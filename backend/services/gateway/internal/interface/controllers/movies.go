@@ -18,7 +18,7 @@ type MovieWithStreamLink struct {
 func AddStreamLink(movie entities.Movie) MovieWithStreamLink {
 	return MovieWithStreamLink{
 		Movie:      movie,
-		StreamLink: fmt.Sprintf("https://vidsrc.xyz/embed/movie/%d", movie.ID),
+		StreamLink: fmt.Sprintf("https://vidsrc.xyz/embed/movie/%d", movie.TheMovieDBID),
 	}
 }
 
