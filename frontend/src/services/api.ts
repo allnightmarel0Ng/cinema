@@ -29,7 +29,23 @@ class ApiService {
   }
 
   public async login(username: string, password: string): Promise<AuthResponse> {
-    const response = await this.api.post<AuthResponse>('/login', { username, password });
+    // Формируем строку для кодирования
+    const credentials = `${username}:${password}`;
+
+    // Кодируем в Base64 (для браузера и Node.js 18+)
+    const encodedCredentials = btoa(credentials);
+
+    // Отправляем запрос с заголовком Authorization
+    const response = await this.api.post<AuthResponse>(
+        '/login',
+        null, // Убираем тело запроса
+        {
+          headers: {
+            Authorization: `Basic ${encodedCredentials}`
+          }
+        }
+    );
+
     return response.data;
   }
 

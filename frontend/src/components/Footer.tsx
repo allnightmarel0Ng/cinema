@@ -63,29 +63,6 @@ const Footer: React.FC = () => {
                 </li>
               </ul>
             </div>
-            
-            <div className="col-span-2 sm:col-span-1">
-              <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider mb-4">
-                Legal
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Cookie Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
         

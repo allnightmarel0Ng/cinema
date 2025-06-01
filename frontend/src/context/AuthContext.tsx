@@ -55,13 +55,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await apiService.login(username, password);
       localStorage.setItem('token', response.token);
-      toast.error(response.token);
+      localStorage.setItem('id', response.user_id.toString());
+      localStorage.setItem('user_name', username);
 
       
-      const decoded = jwtDecode<JwtPayload>(response.token);
       setIsAuthenticated(true);
-      setUserId(decoded.id);
-      setUsername(decoded.sub);
+      setUserId(response.user_id);
+      setUsername(username);
       toast.success('Login successful');
       return true;
     } catch (error) {

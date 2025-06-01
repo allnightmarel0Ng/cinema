@@ -41,7 +41,7 @@ const MovieDetailPage: React.FC = () => {
         setReviews(reviewsData);
         
         if (isAuthenticated && userId) {
-          const userProfile = await apiService.getUserProfile(userId);
+          const userProfile = await apiService.getUserProfile(localStorage.getItem('user_name') as string);
           const userRating = userProfile.ratings.find(r => r.movie_id === parseInt(id, 10));
           if (userRating) {
             setUserRating(userRating.rating);

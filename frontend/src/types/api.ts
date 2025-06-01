@@ -12,6 +12,7 @@ export interface Actor {
 
 export interface Review {
   user_id: number;
+  user_name: string;
   movie_id: number;
   liked: boolean;
   title: string;
@@ -42,13 +43,13 @@ export interface Movie {
 }
 
 export interface User {
-  id: number;
-  login: string;
+  username: string;
   reviews: Review[];
   ratings: Rating[];
 }
 
 export interface AuthResponse {
+  user_id: number;
   token: string;
 }
 
