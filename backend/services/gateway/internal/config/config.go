@@ -13,6 +13,7 @@ type Config struct {
 	Database   DatabaseConfig
 	Redis      RedisConfig
 	Auth       AuthConfig
+	Collector  CollectorConfig
 }
 
 type DatabaseConfig struct {
@@ -32,6 +33,10 @@ type RedisConfig struct {
 type AuthConfig struct {
 	Host    string
 	Timeout time.Duration
+}
+
+type CollectorConfig struct {
+	Addr string
 }
 
 func MustLoad() Config {
@@ -59,6 +64,10 @@ func MustLoad() Config {
 		Auth: AuthConfig{
 			Host:    stringOrDefault("AUTH_HOST", ""),
 			Timeout: timeOrDefault("AUTH_TIMEOUT", 5*time.Second),
+		},
+
+		Collector: CollectorConfig{
+			Addr: stringOrDefault("COLLECTOR_ADDR", ""),
 		},
 	}
 }

@@ -12,6 +12,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/clients"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 )
 
 type httpClient struct {
@@ -38,7 +39,7 @@ func (hc *httpClient) Register(ctx context.Context, body []byte) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := tracing.DefaultHTTPClient().Do(req)
 	if err != nil {
 		return fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
@@ -65,7 +66,7 @@ func (hc *httpClient) Login(ctx context.Context, base64Creds string) (int, strin
 	}
 	req.Header.Set("Authorization", base64Creds)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := tracing.DefaultHTTPClient().Do(req)
 	if err != nil {
 		return 0, "", fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
@@ -105,7 +106,7 @@ func (hc *httpClient) Logout(ctx context.Context, token string) error {
 		return fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := tracing.DefaultHTTPClient().Do(req)
 	if err != nil {
 		return fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
@@ -131,7 +132,7 @@ func (hc *httpClient) Authorize(ctx context.Context, token string) (entities.Use
 		return entities.User{}, fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := tracing.DefaultHTTPClient().Do(req)
 	if err != nil {
 		return entities.User{}, fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
@@ -174,7 +175,7 @@ func (hc *httpClient) Username(ctx context.Context, userID int) (string, error) 
 		return "", err
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := tracing.DefaultHTTPClient().Do(req)
 	if err != nil {
 		return "", err
 	}

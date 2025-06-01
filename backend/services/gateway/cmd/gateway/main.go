@@ -12,11 +12,13 @@ import (
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/config"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/clients/auth"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/actors"
 	moviesubscriber "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movie_subscriber"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movies"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/ratings"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/reviews"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/controllers"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/middleware"
@@ -25,15 +27,26 @@ import (
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	gormtracing "gorm.io/plugin/opentelemetry/tracing"
 )
 
 func main() {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	cfg := config.MustLoad()
+
+	traceFunc := tracing.MustInit(ctx, cfg.Collector.Addr)
+	defer traceFunc()
+
+	metricFunc := metrics.MustInit(ctx, cfg.Collector.Addr)
+	defer metricFunc()
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		cfg.Database.Host, cfg.Database.User, cfg.Database.Password, cfg.Database.Name, cfg.Database.Port)
@@ -50,6 +63,10 @@ func main() {
 		&entities.Review{},
 		&entities.Rating{},
 	); err != nil {
+		panic(err)
+	}
+
+	if err := db.Use(gormtracing.NewPlugin()); err != nil {
 		panic(err)
 	}
 
@@ -88,6 +105,8 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	router.Use(otelgin.Middleware("gateway"))
+
 	api.RegisterHandlersWithOptions(router, mainController, api.GinServerOptions{
 		BaseURL: "/api",
 		Middlewares: []api.MiddlewareFunc{
@@ -102,9 +121,6 @@ func main() {
 	}
 
 	subscriber := moviesubscriber.NewRedisSubcriber(redisClient, cfg.Subscriber)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	ctx = ctxlogrus.ToContext(ctx, logger.WithFields(logrus.Fields{"service": "gateway"}))
 
