@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiService } from '../services/mockApi.ts';
+import { apiService } from '../services/api.ts';
 import { Movie } from '../types/api.ts';
 import MovieGrid from '../components/MovieGrid.tsx';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

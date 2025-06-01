@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { apiService } from '../services/api.ts';
-import {apiService} from "../services/mockApi.ts";
+import { apiService } from '../services/api.ts';
+// import {apiService} from "../services/mockApi.ts";
 import { User, Movie } from '../types/api.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';

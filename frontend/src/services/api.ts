@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { Movie, Actor, Review, User, AuthResponse } from '../types/api.ts';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'http://158.160.167.40:8080';
 
 class ApiService {
   private api: AxiosInstance;
@@ -114,8 +114,8 @@ class ApiService {
   }
 
   // User endpoints
-  public async getUserProfile(id: number): Promise<User> {
-    const response = await this.api.get<User>(`/users/${id}`);
+  public async getUserProfile(username: string): Promise<User> {
+    const response = await this.api.get<User>(`/users/${username}`);
     return response.data;
   }
 }

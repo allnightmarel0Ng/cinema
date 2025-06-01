@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-// import { apiService } from '../services/api.ts';
-import {apiService} from "../services/mockApi.ts";
+import { apiService } from '../services/api.ts';
+// import {apiService} from "../services/mockApi.ts";
 import { Movie, Actor } from '../types/api.ts';
 import MovieGrid from '../components/MovieGrid.tsx';
 import ActorCard from '../components/ActorCard.tsx';

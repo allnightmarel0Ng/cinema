@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// import { apiService } from '../services/api.ts';
-import {apiService} from "../services/mockApi.ts";
+import { apiService } from '../services/api.ts';
+// import {apiService} from "../services/mockApi.ts";
 import { Movie, Review } from '../types/api.ts';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import StarRating from '../components/StarRating.tsx';
@@ -41,7 +41,8 @@ const MovieDetailPage: React.FC = () => {
         setReviews(reviewsData);
         
         if (isAuthenticated && userId) {
-          const userProfile = await apiService.getUserProfile(localStorage.getItem('user_name') as string);
+
+          const userProfile = await apiService.getUserProfile(localStorage.getItem('id') as string);
           const userRating = userProfile.ratings.find(r => r.movie_id === parseInt(id, 10));
           if (userRating) {
             setUserRating(userRating.rating);
