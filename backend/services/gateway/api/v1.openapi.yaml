@@ -135,17 +135,6 @@ paths:
       summary: Login and obtain JWT token
       security:
         - BasicAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
       responses:
         '200':
           description: Successful login
@@ -574,7 +563,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Rating'
-                  login:
+                  username:
                     type: string
         '404':
           description: User was not found
