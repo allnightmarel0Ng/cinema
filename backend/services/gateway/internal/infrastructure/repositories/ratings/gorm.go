@@ -6,6 +6,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	errorwrap "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/error_wrap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -23,7 +24,7 @@ func (gr *gormRatings) CreateRating(ctx context.Context, rating entities.Rating)
 	ctx, cancel := context.WithTimeout(ctx, gr.timeout)
 	defer cancel()
 
-	return gr.db.WithContext(ctx).
+	return errorwrap.Wrap(ctx, gr.db.WithContext(ctx).
 		Clauses(clause.OnConflict{
 			Columns: []clause.Column{
 				{Name: "user_id"},
@@ -31,7 +32,7 @@ func (gr *gormRatings) CreateRating(ctx context.Context, rating entities.Rating)
 			},
 			DoUpdates: clause.AssignmentColumns([]string{"rating"}),
 		}).
-		Create(&rating).Error
+		Create(&rating).Error)
 }
 
 func (gr *gormRatings) DeleteRating(ctx context.Context, userID, movieID int) (float32, error) {
@@ -44,7 +45,7 @@ func (gr *gormRatings) DeleteRating(ctx context.Context, userID, movieID int) (f
 		Where("user_id = ? AND movie_id = ?", userID, movieID).
 		Delete(rating).Error
 
-	return rating.Rating, err
+	return rating.Rating, errorwrap.Wrap(ctx, err)
 }
 
 func (gr *gormRatings) GetUserRatings(ctx context.Context, userID int) ([]entities.Rating, error) {
@@ -55,7 +56,7 @@ func (gr *gormRatings) GetUserRatings(ctx context.Context, userID int) ([]entiti
 	err := gr.db.WithContext(ctx).
 		Where("user_id = ?", userID).
 		Find(&ratings).Error
-	return ratings, err
+	return ratings, errorwrap.Wrap(ctx, err)
 }
 
 func (gr *gormRatings) GetMovieRatings(ctx context.Context, movieID int) ([]entities.Rating, error) {
@@ -66,5 +67,5 @@ func (gr *gormRatings) GetMovieRatings(ctx context.Context, movieID int) ([]enti
 	err := gr.db.WithContext(ctx).
 		Where("movie_id = ?", movieID).
 		Find(&ratings).Error
-	return ratings, err
+	return ratings, errorwrap.Wrap(ctx, err)
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	errorwrap "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/error_wrap"
 	"gorm.io/gorm"
 )
 
@@ -28,7 +29,7 @@ func (ga *gormActors) GetByID(ctx context.Context, id int) (entities.Actor, erro
 
 	var actor entities.Actor
 	err := ga.db.WithContext(ctx).First(&actor, id).Error
-	return actor, err
+	return actor, errorwrap.Wrap(ctx, err)
 }
 
 func (ga *gormActors) SearchByName(ctx context.Context, name string) ([]entities.Actor, error) {
@@ -39,5 +40,5 @@ func (ga *gormActors) SearchByName(ctx context.Context, name string) ([]entities
 	err := ga.db.WithContext(ctx).
 		Where("name ILIKE ?", "%"+name+"%").
 		Find(&actors).Error
-	return actors, err
+	return actors, errorwrap.Wrap(ctx, err)
 }

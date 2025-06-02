@@ -2,8 +2,10 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -16,7 +18,8 @@ import (
 var (
 	responseTimeHistogram metric.Float64Histogram
 	responseCounter       metric.Int64Counter
-	moviesCounter         metric.Int64Counter
+	moviesCounter         metric.Int64Histogram
+	dbResultCounter       metric.Int64Counter
 )
 
 func MustInit(ctx context.Context, collectorAddr string) func() {
@@ -55,9 +58,10 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 		panic(err)
 	}
 
-	moviesCounter, err = meter.Int64Counter("etl_movies_batch_size",
+	moviesCounter, err = meter.Int64Histogram("etl_movies_batch_size",
 		metric.WithDescription("Batch size we got from ETL service"),
 		metric.WithUnit("{count}"),
+		metric.WithExplicitBucketBoundaries(30, 40, 50, 60, 70, 80, 90, 100),
 	)
 	if err != nil {
 		panic(err)
@@ -66,6 +70,14 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 	responseCounter, err = meter.Int64Counter("http_auth_responses_codes",
 		metric.WithDescription("Total HTTP responses by status class"),
 		metric.WithUnit("{response}"),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	dbResultCounter, err = meter.Int64Counter("app_operation_results",
+		metric.WithDescription("Results of operations: success or error types"),
+		metric.WithUnit("{count}"),
 	)
 	if err != nil {
 		panic(err)
@@ -91,11 +103,28 @@ func RecordStatusCodeFromAuth(ctx context.Context, code int, path string) {
 }
 
 func RecordBatchSize(ctx context.Context, size int) {
-	moviesCounter.Add(ctx, 1,
-		metric.WithAttributes(attribute.Int("batch_size", size)),
-	)
+	moviesCounter.Record(ctx, int64(size))
 }
 
+func RecordDBResult(ctx context.Context, err error) {
+	status := "ok"
+	if err != nil {
+		switch {
+		case errors.Is(err, repositories.ErrNotFound):
+			status = "not_found"
+		case errors.Is(err, repositories.ErrUnexpected):
+			status = "unexpected"
+		case errors.Is(err, repositories.ErrInvalidInput):
+			status = "invalid_input"
+		default:
+			status = "other_error"
+		}
+	}
+
+	dbResultCounter.Add(ctx, 1,
+		metric.WithAttributes(attribute.String("result", status)),
+	)
+}
 func getStatusClass(status int) string {
 	switch {
 	case status >= 200 && status < 300:

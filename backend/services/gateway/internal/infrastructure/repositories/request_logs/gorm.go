@@ -6,6 +6,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	errorwrap "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/error_wrap"
 	"gorm.io/gorm"
 )
 
@@ -27,5 +28,5 @@ func (grl *gormRequestLogs) Insert(ctx context.Context, request *entities.Reques
 		return nil
 	}
 
-	return grl.db.WithContext(ctx).Create(request).Error
+	return errorwrap.Wrap(ctx, grl.db.WithContext(ctx).Create(request).Error)
 }

@@ -33,6 +33,7 @@ import (
 	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 	gormtracing "gorm.io/plugin/opentelemetry/tracing"
 )
 
@@ -60,6 +61,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	db.Logger = db.Logger.LogMode(gormlogger.Silent)
 
 	if err = db.AutoMigrate(
 		&entities.Actor{},

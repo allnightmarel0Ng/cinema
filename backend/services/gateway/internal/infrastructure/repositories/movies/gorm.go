@@ -7,6 +7,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	errorwrap "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/error_wrap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -67,7 +68,7 @@ func (gm *gormMovies) InsertMovies(ctx context.Context, movies []entities.Movie)
 					TheMovieDBID: g.TheMovieDBID,
 					Name:         g.Name,
 				}).Error; err != nil {
-					return err
+					return errorwrap.Wrap(ctx, err)
 				}
 				genres[i] = genre
 			}
@@ -81,7 +82,7 @@ func (gm *gormMovies) InsertMovies(ctx context.Context, movies []entities.Movie)
 					Gender:       a.Gender,
 					ProfilePath:  a.ProfilePath,
 				}).Error; err != nil {
-					return err
+					return errorwrap.Wrap(ctx, err)
 				}
 				actors[i] = actor
 			}
@@ -94,27 +95,27 @@ func (gm *gormMovies) InsertMovies(ctx context.Context, movies []entities.Movie)
 
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				if err := tx.WithContext(ctx).Create(&movie).Error; err != nil {
-					return err
+					return errorwrap.Wrap(ctx, err)
 				}
 			} else if err == nil {
 				movie.ID = existingMovie.ID
 				if err := tx.WithContext(ctx).Save(&movie).Error; err != nil {
-					return err
+					return errorwrap.Wrap(ctx, err)
 				}
 			} else {
-				return err
+				return errorwrap.Wrap(ctx, err)
 			}
 
 			if err := tx.WithContext(ctx).Model(&movie).Association("Genres").Replace(genres); err != nil {
-				return err
+				return errorwrap.Wrap(ctx, err)
 			}
 			if err := tx.WithContext(ctx).Model(&movie).Association("Actors").Replace(actors); err != nil {
-				return err
+				return errorwrap.Wrap(ctx, err)
 			}
 
 		}
 
-		return nil
+		return errorwrap.Wrap(ctx, nil)
 	})
 }
 
@@ -132,10 +133,10 @@ func (gm *gormMovies) AddVote(ctx context.Context, movieID int, newValue float32
 		currentTotal := movie.VoteAverage * float32(movie.VoteCount)
 		newAverage := (currentTotal + newValue) / float32(newCount)
 
-		return tx.Model(&movie).Updates(map[string]interface{}{
+		return errorwrap.Wrap(ctx, tx.Model(&movie).Updates(map[string]interface{}{
 			"vote_average": newAverage,
 			"vote_count":   newCount,
-		}).Error
+		}).Error)
 	})
 }
 
@@ -163,9 +164,9 @@ func (gm *gormMovies) DeleteVote(ctx context.Context, movieID int, oldValue floa
 			newAverage = newTotal / float32(newCount)
 		}
 
-		return tx.Model(&movie).Updates(map[string]interface{}{
+		return errorwrap.Wrap(ctx, tx.Model(&movie).Updates(map[string]interface{}{
 			"vote_average": newAverage,
 			"vote_count":   newCount,
-		}).Error
+		}).Error)
 	})
 }
