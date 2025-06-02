@@ -9,6 +9,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func MustInit(ctx context.Context, collectorAddr string) func() {
@@ -24,7 +25,7 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("your-service-name"),
+			semconv.ServiceNameKey.String("gateway"),
 		)),
 	)
 
@@ -35,4 +36,8 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 	))
 
 	return func() { tp.Shutdown(ctx) }
+}
+
+func GetTraceID(ctx context.Context) string {
+	return trace.SpanFromContext(ctx).SpanContext().TraceID().String()
 }

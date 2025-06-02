@@ -1,0 +1,8 @@
+{
+  "/api/*": "/$1",
+  "/movies/search?prompt=:prompt": "/movies?title_like=:prompt",
+  "/actors/search?prompt=:prompt": "/actors?name_like=:prompt",
+  "/reviews/:movie_id": "/reviews?movie_id=:movie_id",
+  "/users/:id/reviews": "/reviews?user_id=:id",
+  "/users/:id/ratings": "/ratings?user_id=:id"
+}

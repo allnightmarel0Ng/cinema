@@ -17,6 +17,7 @@ import (
 	moviesubscriber "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movie_subscriber"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/movies"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/ratings"
+	requestlogs "github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/request_logs"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/repositories/reviews"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
@@ -28,6 +29,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormtracing "gorm.io/plugin/opentelemetry/tracing"
@@ -70,6 +72,16 @@ func main() {
 		panic(err)
 	}
 
+	clickhouse, err := gorm.Open(clickhouse.Open(fmt.Sprintf("clickhouse://%s:%s@%s:%s/%s",
+		cfg.Clickhouse.User, cfg.Clickhouse.Password, cfg.Clickhouse.Host, cfg.Clickhouse.Port, cfg.Clickhouse.Name)))
+	if err != nil {
+		panic(err)
+	}
+
+	clickhouse.AutoMigrate(&entities.RequestLog{})
+
+	requestLogs := requestlogs.NewGORMRepository(clickhouse, cfg.Clickhouse.Timeout)
+
 	authClient := auth.NewHTTPClient(cfg.Auth.Host, cfg.Auth.Timeout)
 
 	moviesRepo := movies.NewGORMRepository(db, cfg.Database.Timeout)
@@ -110,6 +122,8 @@ func main() {
 	api.RegisterHandlersWithOptions(router, mainController, api.GinServerOptions{
 		BaseURL: "/api",
 		Middlewares: []api.MiddlewareFunc{
+			api.MiddlewareFunc(middleware.NewMetric()),
+			api.MiddlewareFunc(middleware.NewSendRequestLog(requestLogs)),
 			api.MiddlewareFunc(middleware.NewLogger(logger.WithFields(logrus.Fields{"service": "gateway"}))),
 			api.MiddlewareFunc(middleware.NewAuth(authClient)),
 		},
