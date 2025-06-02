@@ -9,6 +9,7 @@ import (
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 	"github.com/gin-gonic/gin"
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func NewSendRequestLog(requestLogs repositories.RequestLogs) gin.HandlerFunc {
@@ -17,25 +18,25 @@ func NewSendRequestLog(requestLogs repositories.RequestLogs) gin.HandlerFunc {
 		c.Next()
 
 		ctx := context.WithoutCancel(c.Request.Context())
-		go func(ctx context.Context) {
-			user, _ := UserFromContext(ctx)
+		user, _ := UserFromContext(ctx)
 
-			requestLog := &entities.RequestLog{
-				TraceID:        tracing.GetTraceID(ctx),
-				Timestamp:      time.Now(),
-				Method:         c.Request.Method,
-				Path:           c.Request.URL.Path,
-				NormalizedPath: c.FullPath(),
-				StatusCode:     c.Writer.Status(),
-				StatusClass:    getStatusClass(c.Writer.Status()),
-				DurationMs:     int(time.Since(start).Milliseconds()),
-				UserID:         user.ID,
-			}
+		requestLog := &entities.RequestLog{
+			TraceID:        tracing.GetTraceID(ctx),
+			Timestamp:      time.Now(),
+			Method:         c.Request.Method,
+			Path:           c.Request.URL.Path,
+			NormalizedPath: c.FullPath(),
+			StatusCode:     c.Writer.Status(),
+			StatusClass:    getStatusClass(c.Writer.Status()),
+			DurationMs:     int(time.Since(start).Milliseconds()),
+			UserID:         user.ID,
+		}
 
+		go func() {
 			if err := requestLogs.Insert(ctx, requestLog); err != nil {
 				ctxlogrus.Extract(ctx).Warnf("unable to send request log to database %s", err.Error())
 			}
-		}(ctx)
+		}()
 	}
 }
 

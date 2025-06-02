@@ -154,9 +154,9 @@ func main() {
 		BaseURL: "/api",
 		Middlewares: []api.MiddlewareFunc{
 			api.MiddlewareFunc(middleware.NewMetric()),
-			api.MiddlewareFunc(middleware.NewSendRequestLog(requestLogs)),
 			api.MiddlewareFunc(middleware.NewLogger(logger.WithFields(logrus.Fields{"service": "gateway"}))),
 			api.MiddlewareFunc(middleware.NewAuth(authClient)),
+			api.MiddlewareFunc(middleware.NewSendRequestLog(requestLogs)),
 		},
 	})
 
