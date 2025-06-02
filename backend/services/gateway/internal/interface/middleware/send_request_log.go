@@ -9,7 +9,6 @@ import (
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 	"github.com/gin-gonic/gin"
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func NewSendRequestLog(requestLogs repositories.RequestLogs) gin.HandlerFunc {
