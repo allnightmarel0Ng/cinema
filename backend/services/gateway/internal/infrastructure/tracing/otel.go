@@ -24,7 +24,7 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("your-service-name"),
+			semconv.ServiceNameKey.String("gateway"),
 		)),
 	)
 

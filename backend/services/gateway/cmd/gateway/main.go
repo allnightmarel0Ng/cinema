@@ -110,6 +110,7 @@ func main() {
 	api.RegisterHandlersWithOptions(router, mainController, api.GinServerOptions{
 		BaseURL: "/api",
 		Middlewares: []api.MiddlewareFunc{
+			api.MiddlewareFunc(middleware.NewMetric()),
 			api.MiddlewareFunc(middleware.NewLogger(logger.WithFields(logrus.Fields{"service": "gateway"}))),
 			api.MiddlewareFunc(middleware.NewAuth(authClient)),
 		},

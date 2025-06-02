@@ -12,6 +12,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/clients"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 )
 
@@ -45,6 +46,8 @@ func (hc *httpClient) Register(ctx context.Context, body []byte) error {
 	}
 	defer resp.Body.Close()
 
+	metrics.RecordStatusCodeFromAuth(ctx, resp.StatusCode, "/register")
+
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
@@ -76,6 +79,8 @@ func (hc *httpClient) Login(ctx context.Context, base64Creds string) (int, strin
 	if err != nil {
 		return 0, "", fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
+
+	metrics.RecordStatusCodeFromAuth(ctx, resp.StatusCode, "/login")
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -112,6 +117,8 @@ func (hc *httpClient) Logout(ctx context.Context, token string) error {
 	}
 	defer resp.Body.Close()
 
+	metrics.RecordStatusCodeFromAuth(ctx, resp.StatusCode, "/logout")
+
 	switch resp.StatusCode {
 	case http.StatusOK:
 		return nil
@@ -142,6 +149,8 @@ func (hc *httpClient) Authorize(ctx context.Context, token string) (entities.Use
 	if err != nil {
 		return entities.User{}, fmt.Errorf("%w: %s", clients.ErrUnexpected, err.Error())
 	}
+
+	metrics.RecordStatusCodeFromAuth(ctx, resp.StatusCode, "/authorize")
 
 	switch resp.StatusCode {
 	case http.StatusOK:
@@ -185,6 +194,8 @@ func (hc *httpClient) Username(ctx context.Context, userID int) (string, error) 
 	if err != nil {
 		return "", err
 	}
+
+	metrics.RecordStatusCodeFromAuth(ctx, resp.StatusCode, "/username")
 
 	switch resp.StatusCode {
 	case http.StatusOK:
