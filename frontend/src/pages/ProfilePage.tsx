@@ -27,7 +27,7 @@ const ProfilePage: React.FC = () => {
       setError(null);
       
       try {
-        const userData = await apiService.getUserProfile(localStorage.getItem('user_name') as string);
+        const userData = await apiService.getUserProfile(localStorage.getItem('id') as string);
         setUserProfile(userData);
         
         // Fetch movie details for all reviews and ratings

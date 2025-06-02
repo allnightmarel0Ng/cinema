@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center" onClick={() => setIsMenuOpen(false)}>
               <Film className="h-8 w-8 text-secondary-500" />
-              <span className="ml-2 text-xl font-bold text-white">CinemaHub</span>
+              <span className="ml-2 text-xl font-bold text-white">Cinema</span>
             </Link>
           </div>
 

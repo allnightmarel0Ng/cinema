@@ -117,8 +117,8 @@ class ApiService {
   }
 
   // User endpoints
-  public async getUserProfile(username: string): Promise<User> {
-    const response = await this.api.get<User>(`/users/${username}`);
+  public async getUserProfile(id: string): Promise<User> {
+    const response = await this.api.get<User>(`/users/${id}`);
     return response.data;
   }
 }
