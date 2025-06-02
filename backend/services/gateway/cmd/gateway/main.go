@@ -106,7 +106,7 @@ func main() {
 
 	if err = clickhouse.Exec(`
         ALTER TABLE request_logs 
-        MODIFY TTL timestamp + INTERVAL 30 DAY
+        MODIFY TTL toDateTime(timestamp) + INTERVAL 30 DAY
     `).Error; err != nil {
 		panic(err)
 	}

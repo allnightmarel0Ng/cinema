@@ -4,6 +4,8 @@ services:
     build:
       context: ../services/gateway
     restart: always
+    ports:
+      - "8080:8080"
   promtail:
     image: grafana/promtail:latest
     container_name: promtail
