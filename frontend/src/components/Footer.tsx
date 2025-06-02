@@ -10,11 +10,8 @@ const Footer: React.FC = () => {
           <div className="mb-6 md:mb-0">
             <Link to="/" className="flex items-center">
               <Film className="h-8 w-8 text-secondary-500" />
-              <span className="ml-2 text-xl font-bold text-white">CinemaHub</span>
+              <span className="ml-2 text-xl font-bold text-white">Cinema</span>
             </Link>
-            <p className="mt-2 text-sm text-gray-400">
-              Your gateway to the world of cinema
-            </p>
           </div>
           
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-6">
@@ -64,12 +61,6 @@ const Footer: React.FC = () => {
               </ul>
             </div>
           </div>
-        </div>
-        
-        <div className="mt-8 pt-8 border-t border-dark-700">
-          <p className="text-sm text-gray-400 text-center flex items-center justify-center">
-            Made with <Heart className="h-4 w-4 text-secondary-500 mx-1 fill-secondary-500" /> for cinema enthusiasts
-          </p>
         </div>
       </div>
     </footer>

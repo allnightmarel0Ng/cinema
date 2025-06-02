@@ -77,7 +77,7 @@ func MustInit(ctx context.Context, collectorAddr string) func() {
 }
 
 func RecordResponseTime(ctx context.Context, duration time.Duration, path string) {
-	responseTimeHistogram.Record(ctx, float64(duration), metric.WithAttributes(attribute.String("path", path)))
+	responseTimeHistogram.Record(ctx, float64(duration.Milliseconds()), metric.WithAttributes(attribute.String("path", path)))
 }
 
 func RecordStatusCodeFromAuth(ctx context.Context, code int, path string) {
