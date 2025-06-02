@@ -5,7 +5,7 @@ import "time"
 type Movie struct {
 	ID                    int       `gorm:"primaryKey;autoIncrement" json:"id"`
 	TheMovieDBID          int64     `gorm:"index:idx_movie_tmdb_id,unique;column:tmdb_id" json:"tmdb_id"`
-	Title                 string    `gorm:"index:idx_movie_title" json:"title"`
+	Title                 string    `json:"title"`
 	Overview              string    `gorm:"type:text" json:"overview"`
 	ReleaseDate           time.Time `json:"release_date"`
 	PosterPath            string    `json:"poster_path"`

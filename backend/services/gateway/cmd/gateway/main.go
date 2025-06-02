@@ -68,6 +68,24 @@ func main() {
 		panic(err)
 	}
 
+	if err = db.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm;").Error; err != nil {
+		panic(err)
+	}
+
+	if err = db.Exec(`
+    	CREATE INDEX IF NOT EXISTS idx_movies_title_trgm 
+    	ON movies USING gin (title gin_trgm_ops)
+	`).Error; err != nil {
+		panic(err)
+	}
+
+	if err = db.Exec(`
+    	CREATE INDEX IF NOT EXISTS idx_actors_name_trgm 
+    	ON actors USING gin (name gin_trgm_ops)
+	`).Error; err != nil {
+		panic(err)
+	}
+
 	if err = db.Use(gormtracing.NewPlugin()); err != nil {
 		panic(err)
 	}
