@@ -36,7 +36,6 @@ func (rs *redisSubscriber) Subscribe(ctx context.Context) <-chan []entities.Movi
 				return
 			case msg := <-sub:
 				var movies []movie
-				ctxlogrus.Extract(ctx).Info(msg.Payload)
 				if err := json.Unmarshal([]byte(msg.Payload), &movies); err != nil {
 					ctxlogrus.Extract(ctx).Warn("unable to unmrshal data from redis")
 					continue

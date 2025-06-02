@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
 )
 
@@ -32,6 +33,7 @@ func (p *Poller) Poll(ctx context.Context) {
 			}
 
 			ctxlogrus.Extract(ctx).Infof("got %d movies", len(batch))
+			metrics.RecordBatchSize(ctx, len(batch))
 		}
 	}
 }
