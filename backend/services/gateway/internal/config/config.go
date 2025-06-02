@@ -14,6 +14,7 @@ type Config struct {
 	Redis      RedisConfig
 	Auth       AuthConfig
 	Collector  CollectorConfig
+	Clickhouse ClickhouseConfig
 }
 
 type DatabaseConfig struct {
@@ -37,6 +38,16 @@ type AuthConfig struct {
 
 type CollectorConfig struct {
 	Addr string
+}
+
+type ClickhouseConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+
+	Timeout time.Duration
 }
 
 func MustLoad() Config {
@@ -68,6 +79,16 @@ func MustLoad() Config {
 
 		Collector: CollectorConfig{
 			Addr: stringOrDefault("COLLECTOR_ADDR", ""),
+		},
+
+		Clickhouse: ClickhouseConfig{
+			Host:     stringOrDefault("CLICKHOUSE_HOST", ""),
+			Port:     stringOrDefault("CLICKHOUSE_PORT", ""),
+			User:     stringOrDefault("CLICKHOUSE_USER", ""),
+			Password: stringOrDefault("CLICKHOUSE_PASSWORD", ""),
+			Name:     stringOrDefault("CLICKHOUSE_NAME", ""),
+
+			Timeout: timeOrDefault("CLICKHOUSE_TIMEOUT", 2*time.Second),
 		},
 	}
 }
