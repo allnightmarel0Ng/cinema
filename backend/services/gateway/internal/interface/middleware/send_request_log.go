@@ -16,8 +16,8 @@ func NewSendRequestLog(requestLogs repositories.RequestLogs) gin.HandlerFunc {
 		start := time.Now()
 		c.Next()
 
-		go func() {
-			ctx := context.WithoutCancel(c.Request.Context())
+		ctx := context.WithoutCancel(c.Request.Context())
+		go func(ctx context.Context) {
 			user, _ := UserFromContext(ctx)
 
 			requestLog := &entities.RequestLog{
@@ -35,7 +35,7 @@ func NewSendRequestLog(requestLogs repositories.RequestLogs) gin.HandlerFunc {
 			if err := requestLogs.Insert(ctx, requestLog); err != nil {
 				ctxlogrus.Extract(ctx).Warnf("unable to send request log to database %s", err.Error())
 			}
-		}()
+		}(ctx)
 	}
 }
 
