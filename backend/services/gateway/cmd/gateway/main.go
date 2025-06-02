@@ -68,7 +68,25 @@ func main() {
 		panic(err)
 	}
 
-	if err := db.Use(gormtracing.NewPlugin()); err != nil {
+	if err = db.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm;").Error; err != nil {
+		panic(err)
+	}
+
+	if err = db.Exec(`
+    	CREATE INDEX IF NOT EXISTS idx_movies_title_trgm 
+    	ON movies USING gin (title gin_trgm_ops)
+	`).Error; err != nil {
+		panic(err)
+	}
+
+	if err = db.Exec(`
+    	CREATE INDEX IF NOT EXISTS idx_actors_name_trgm 
+    	ON actors USING gin (name gin_trgm_ops)
+	`).Error; err != nil {
+		panic(err)
+	}
+
+	if err = db.Use(gormtracing.NewPlugin()); err != nil {
 		panic(err)
 	}
 
@@ -78,7 +96,20 @@ func main() {
 		panic(err)
 	}
 
-	clickhouse.AutoMigrate(&entities.RequestLog{})
+	if err = clickhouse.AutoMigrate(&entities.RequestLog{}); err != nil {
+		panic(err)
+	}
+
+	if err = clickhouse.Use(gormtracing.NewPlugin()); err != nil {
+		panic(err)
+	}
+
+	if err = clickhouse.Exec(`
+        ALTER TABLE request_logs 
+        MODIFY TTL timestamp + INTERVAL 30 DAY
+    `).Error; err != nil {
+		panic(err)
+	}
 
 	requestLogs := requestlogs.NewGORMRepository(clickhouse, cfg.Clickhouse.Timeout)
 
