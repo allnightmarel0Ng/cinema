@@ -28,26 +28,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      try {
-        const decoded = jwtDecode<JwtPayload>(token);
-        const currentTime = Date.now() / 1000;
-        
-        if (decoded.exp > currentTime) {
-          setIsAuthenticated(true);
-          setUserId(decoded.id);
-          setUsername(decoded.sub);
-        } else {
-          localStorage.removeItem('token');
-          setIsAuthenticated(false);
-          setUserId(null);
-          setUsername(null);
-        }
-      } catch (error) {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-        setUserId(null);
-        setUsername(null);
-      }
+      setIsAuthenticated(true);
+      setUserId(localStorage.getItem('id'));
+      setUsername(localStorage.getItem('user_name'));
     }
   }, []);
 
@@ -55,12 +38,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await apiService.login(username, password);
       localStorage.setItem('token', response.token);
-      localStorage.setItem('id', response.user_id.toString());
+      localStorage.setItem('id', response.id.toString());
       localStorage.setItem('user_name', username);
 
       
       setIsAuthenticated(true);
-      setUserId(response.user_id);
+      setUserId(response.id);
       setUsername(username);
       toast.success('Login successful');
       return true;

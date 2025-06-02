@@ -49,7 +49,7 @@ export interface User {
 }
 
 export interface AuthResponse {
-  user_id: number;
+  id: number;
   token: string;
 }
 
