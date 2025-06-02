@@ -68,7 +68,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := db.Use(gormtracing.NewPlugin()); err != nil {
+	if err = db.Use(gormtracing.NewPlugin()); err != nil {
 		panic(err)
 	}
 
@@ -78,7 +78,20 @@ func main() {
 		panic(err)
 	}
 
-	clickhouse.AutoMigrate(&entities.RequestLog{})
+	if err = clickhouse.AutoMigrate(&entities.RequestLog{}); err != nil {
+		panic(err)
+	}
+
+	if err = clickhouse.Use(gormtracing.NewPlugin()); err != nil {
+		panic(err)
+	}
+
+	if err = clickhouse.Exec(`
+        ALTER TABLE request_logs 
+        MODIFY TTL timestamp + INTERVAL 30 DAY
+    `).Error; err != nil {
+		panic(err)
+	}
 
 	requestLogs := requestlogs.NewGORMRepository(clickhouse, cfg.Clickhouse.Timeout)
 
