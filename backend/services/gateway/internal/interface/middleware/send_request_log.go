@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"time"
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
@@ -22,7 +21,7 @@ func NewSendRequestLog(requestLogs repositories.RequestLogs, tracer trace.Tracer
 		logger := ctxlogrus.Extract(c.Request.Context())
 
 		go func() {
-			ctx, span := tracer.Start(context.Background(), "request_log")
+			ctx, span := tracer.Start(c.Request.Context(), "request_log")
 			defer span.End()
 
 			requestLog := &entities.RequestLog{
