@@ -29,6 +29,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel"
 	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -46,6 +47,8 @@ func main() {
 
 	traceFunc := tracing.MustInit(ctx, cfg.Collector.Addr)
 	defer traceFunc()
+
+	tracer := otel.Tracer("gateway")
 
 	metricFunc := metrics.MustInit(ctx, cfg.Collector.Addr)
 	defer metricFunc()
@@ -156,7 +159,7 @@ func main() {
 			api.MiddlewareFunc(middleware.NewMetric()),
 			api.MiddlewareFunc(middleware.NewLogger(logger.WithFields(logrus.Fields{"service": "gateway"}))),
 			api.MiddlewareFunc(middleware.NewAuth(authClient)),
-			api.MiddlewareFunc(middleware.NewSendRequestLog(requestLogs)),
+			api.MiddlewareFunc(middleware.NewSendRequestLog(requestLogs, tracer)),
 		},
 	})
 
