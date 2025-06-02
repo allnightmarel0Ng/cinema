@@ -15,14 +15,16 @@ datasources:
     type: jaeger
     access: proxy
     url: http://jaeger:16686
-  
+ 
   - name: ClickHouse
     type: grafana-clickhouse-datasource
     access: proxy
     url: http://clickhouse:8123
-    jsonData:
-      username: ${CLICKHOUSE_ADMIN}
-      password: ${CLICKHOUSE_PASSWORD}
-      defaultDatabase: default
     secureJsonData:
-      password: ${CLICKHOUSE_PASSWORD}
+      username: admin
+      password:
+    jsonData:
+      defaultDatabase: request_logs
+      tlsSkipVerify: true
+    version: 1
+    editable: true 
