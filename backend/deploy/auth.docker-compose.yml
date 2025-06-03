@@ -28,16 +28,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   promtail:
-    image: grafana/promtail:2.8.2
+    image: grafana/promtail:latest
     container_name: promtail
     volumes:
-      - /var/log:/var/log
-      - ./configs/promtail-internal.yaml
-      # - ./promtail-config.yml:/etc/promtail/config.yml
-    command:
-      - "-config.file=/etc/promtail/config.yml"
-
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./configs/promtail-internal.yaml:/etc/promtail/config.yml
 volumes:
   auth_db_data:
