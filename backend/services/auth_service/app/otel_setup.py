@@ -14,7 +14,7 @@ from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExp
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 
 def setup_tracing(app):
-    endpoint = os.getenv("OTEL_EXPORTER_ENDPOINT", "localhost:4317")
+    endpoint = "10.0.0.11:4317"
     resource = Resource(attributes={"service.name": "auth_service"})
     tracer_provider = TracerProvider(resource=resource)
     trace.set_tracer_provider(tracer_provider)
@@ -28,7 +28,7 @@ def setup_tracing(app):
     SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine)
 
 def setup_metrics():
-    endpoint = os.getenv("OTEL_EXPORTER_ENDPOINT", "localhost:4317")
+    endpoint = "10.0.0.11:4317"
     resource = Resource(attributes={"service.name": "auth_service"})
     metric_reader = PeriodicExportingMetricReader(
         OTLPMetricExporter(endpoint=endpoint, insecure=True)

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     DATABASE_URL: str
     REDIS_HOST: str
+    OTEL_EXPORTER_ENDPOINT: str
 
     class Config:
         env_file = ".env"
