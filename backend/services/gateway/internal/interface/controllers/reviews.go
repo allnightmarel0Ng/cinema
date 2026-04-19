@@ -7,6 +7,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/middleware"
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,10 @@ func (r Reviews) DeleteReviewsMovieId(c *gin.Context, movieId int) {
 		sendError(c, err)
 		return
 	}
+
+	// Бизнес-метрика: удаление отзыва
+	metrics.RecordReviewDeleted(c.Request.Context())
+	metrics.RecordUserAction(c.Request.Context(), user.ID, "review")
 
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -81,6 +86,10 @@ func (r Reviews) PostReviewsMovieId(c *gin.Context, movieId int) {
 		sendError(c, err)
 		return
 	}
+
+	// Бизнес-метрика: создание/обновление отзыва
+	metrics.RecordReviewCreated(c.Request.Context())
+	metrics.RecordUserAction(c.Request.Context(), user.ID, "review")
 
 	c.JSON(http.StatusOK, gin.H{})
 }

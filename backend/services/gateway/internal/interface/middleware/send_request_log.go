@@ -6,6 +6,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/tracing"
 	"github.com/gin-gonic/gin"
 	"github.com/improbable-eng/go-httpwares/logging/logrus/ctxlogrus"
@@ -17,6 +18,12 @@ func NewSendRequestLog(requestLogs repositories.RequestLogs, tracer trace.Tracer
 		start := time.Now()
 		fullPath := c.FullPath()
 		c.Next()
+
+		duration := time.Since(start)
+		statusCode := c.Writer.Status()
+
+		// Record HTTP request metric (всегда, для всех эндпоинтов)
+		metrics.RecordHTTPRequest(c.Request.Context(), c.Request.Method, fullPath, statusCode)
 
 		user, _ := UserFromContext(c.Request.Context())
 		logger := ctxlogrus.Extract(c.Request.Context())
@@ -30,9 +37,9 @@ func NewSendRequestLog(requestLogs repositories.RequestLogs, tracer trace.Tracer
 				Method:         c.Request.Method,
 				Path:           c.Request.URL.Path,
 				NormalizedPath: fullPath,
-				StatusCode:     c.Writer.Status(),
-				StatusClass:    getStatusClass(c.Writer.Status()),
-				DurationMs:     int(time.Since(start).Milliseconds()),
+				StatusCode:     statusCode,
+				StatusClass:    getStatusClass(statusCode),
+				DurationMs:     int(duration.Milliseconds()),
 				UserID:         user.ID,
 			}
 

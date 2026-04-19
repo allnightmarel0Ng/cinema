@@ -5,6 +5,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/middleware"
 	"github.com/gin-gonic/gin"
@@ -50,6 +51,10 @@ func (r Ratings) PostRating(c *gin.Context, params api.PostRatingParams) {
 		return
 	}
 
+	// Бизнес-метрика: выставление оценки
+	metrics.RecordRatingCreated(c.Request.Context())
+	metrics.RecordUserAction(c.Request.Context(), user.ID, "rate")
+
 	c.JSON(http.StatusOK, gin.H{})
 }
 
@@ -70,6 +75,10 @@ func (r Ratings) DeleteRating(c *gin.Context, params api.DeleteRatingParams) {
 		sendError(c, err)
 		return
 	}
+
+	// Бизнес-метрика: удаление оценки
+	metrics.RecordRatingDeleted(c.Request.Context())
+	metrics.RecordUserAction(c.Request.Context(), user.ID, "rate")
 
 	c.JSON(http.StatusOK, gin.H{})
 }

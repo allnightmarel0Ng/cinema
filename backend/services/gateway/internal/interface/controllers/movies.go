@@ -6,6 +6,7 @@ import (
 
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/entities"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/domain/repositories"
+	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/infrastructure/metrics"
 	"github.com/allnighmatel0Ng/cinema/backend/services/gateway/internal/interface/api"
 	"github.com/gin-gonic/gin"
 )
@@ -39,6 +40,9 @@ func (m Movies) GetMoviesId(c *gin.Context, id int) {
 		return
 	}
 
+	// Бизнес-метрика: просмотр карточки фильма
+	metrics.RecordMovieView(c.Request.Context())
+
 	c.JSON(http.StatusOK, AddStreamLink(movie))
 }
 
@@ -47,7 +51,6 @@ func (m Movies) GetMoviesPopular(c *gin.Context, params api.GetMoviesPopularPara
 		if params.Page == nil {
 			return 1
 		}
-
 		return *params.Page
 	}()
 
@@ -55,7 +58,6 @@ func (m Movies) GetMoviesPopular(c *gin.Context, params api.GetMoviesPopularPara
 		if params.Size == nil {
 			return 5
 		}
-
 		return *params.Size
 	}()
 
@@ -86,6 +88,9 @@ func (m Movies) GetMoviesSearch(c *gin.Context, params api.GetMoviesSearchParams
 		sendError(c, err)
 		return
 	}
+
+	// Бизнес-метрика: поиск фильмов
+	metrics.RecordSearch(c.Request.Context(), "movie")
 
 	withStreamLinks := make([]MovieWithStreamLink, 0, len(found))
 	for _, movie := range found {
